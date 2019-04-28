@@ -199,28 +199,46 @@ void ErrMsg(const char *fmt, ...)
 *@date 2019年1月21日
 *@note 新生成函数
 */
-bool ErrMsgRet(bool bCondition, const char *fmt, ...)
+bool CondJudge(bool bCondition, const char *fmt, ...)
 {
     if (!bCondition)
     {
         va_list		ap;
         va_start(ap, fmt);
-
-        char buf[MAXLINE] = {0};
-        (buf, __FUNCTION__);
-        strcat(buf, ": ");
-
-        vsnprintf(buf+strlen(buf), MAXLINE- (1 + strlen(buf)), fmt, ap);
-        fflush(stdout);		/* in case stdout and stderr arde the same */
-        fputs(buf, stderr);
-        fflush(NULL);		/* flushes all stdio output streams */
-
-        va_end(ap);
+		ErrDoit(0, 0, fmt, ap);
+		va_end(ap);
     }
     return bCondition;
 }
 
+/**
+*@brief 作用类似于assert,返回错误结果，同时判断条件为false的情况，输出相应错误信息,以及errno相关的信息
+*
+*
+*@param bool bCondition
+*@param const char *fmt
+*@param ...
+*
+*@return bool
+*
+*
+*@author Litost_Cheng
+*@date 2019年1月21日
+*@note 新生成函数
+*/
+bool CondJudgeAndErrno(bool bCondition, const char *fmt, ...)
+{
+	if (!bCondition)
+	{
+		va_list ap;
 
+		va_start(ap, fmt);
+		ErrDoit(1, errno, fmt, ap);
+		va_end(ap);
+
+	}
+	return bCondition;
+}
 
 /**
 *@brief 输出相应错误信息，并终止程序执行
@@ -255,7 +273,7 @@ void ErrQuit(const char *fmt, ...)
 *@param const char *fmt
 *@param va_list ap
 *
-*@return static
+*@return
 * 
 *
 *@author Litost_Cheng
@@ -268,8 +286,8 @@ static void ErrDoit(int errnoflag, int error, const char *fmt, va_list ap)
 
 	vsnprintf(buf, MAXLINE-1, fmt, ap);
 	if (errnoflag)
-		snprintf(buf+strlen(buf), MAXLINE-strlen(buf)-1, ": %s",
-		  strerror(error));
+		snprintf(buf + strlen(buf), MAXLINE - strlen(buf) - 1, ": errno[%d] %s",
+				 error, strerror(error));
 	strcat(buf, "\n");
 	fflush(stdout);		/* in case stdout and stderr are the same */
 	fputs(buf, stderr);

@@ -33,6 +33,32 @@
  * 宏定义                                 *
  *----------------------------------------------*/
 #define	MAXLINE	4096			/* max line length */
+/**
+*@brief 体检判断，并返回预定值
+*
+*
+*@param bCondition
+*@param Res
+*@param fmt
+*@param arg...
+*
+* 
+*
+*@author Litost_Cheng
+*@date 2019年4月22日
+*@note 新生成函数
+*
+*/
+#define  CondJudgeReturn(bCondition, Res, fmt, arg...) do{\
+    if (!bCondition)\
+    {\
+    	printf(fmt, ##arg);\
+		return (Res);\
+    }\
+\
+}while(0);
+
+
 
 /*----------------------------------------------*
  * 枚举定义                            *
@@ -56,7 +82,11 @@ extern void ErrMsg(const char *fmt, ...);
 extern void ErrQuit(const char *fmt, ...);
 extern void ErrRet(const char *fmt, ...);
 extern void ErrSys(const char *fmt, ...);
-extern bool ErrMsgRet(bool bCondition, const char *fmt, ...);
+extern bool CondJudge(bool bCondition, const char *fmt, ...);
+extern bool CondJudgeAndErrno(bool bCondition, const char *fmt, ...);
+
+
+
 
 /*----------------------------------------------*
  * 全局变量                                     *
